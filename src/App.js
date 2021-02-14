@@ -1,10 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import FlashcardList from "./FlashcardList";
 import './app.css'
 import axios from 'axios'
 
 function App() {
   const [flashcards, setFlashcards] = useState(SAMPLE_FLASHCARDS)
+  const categoryEl = useRef()
+
+  useEffect(() => {
+    axios
+    .get('https://opentdb.com/api_category.php')
+    .then(response => {
+      const {data} = response
+      console.log(data.trivia_categories)
+    })
+  }, [])
 
   useEffect(() => {
     axios
@@ -33,17 +43,31 @@ function App() {
     })
   }, [])
 
-// this function converts all html chars inside the questions to normal string
-function decodeString(str) {
-  const textArea = document.createElement('textarea')
-  textArea.innerHTML = str
-  return textArea.value
-}
+  // this function converts all html chars inside the questions to normal string
+  function decodeString(str) {
+    const textArea = document.createElement('textarea')
+    textArea.innerHTML = str
+    return textArea.value
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault()
+  }
 
   return (
+    <>
+    <form className="header" onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label htmlFor="category">Category</label>
+        <select id="category" ref={categoryEl}>
+        </select>
+      </div>
+    </form>
+    
     <div>
       <FlashcardList flashcards={flashcards}/>
     </div>
+    </>
   );
 }
 
